@@ -102,6 +102,7 @@
         /// </returns>
         protected override ActionResult HandleShippingAddressSaveSuccess(FastTrackCheckoutAddressModel model)
         {
+            // SS 
             // If the customer is logged in save the address to their default customer shipping address for the next use
             if (!CurrentCustomer.IsAnonymous)
             {

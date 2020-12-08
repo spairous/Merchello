@@ -277,6 +277,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Umbraco.Addons\CL.Helper.General\CL.Helper.General\CL.Helper.General.csproj">
+      <Project>{be511f31-5873-4eab-8bf8-c81b664c4465}</Project>
+      <Name>CL.Helper.General</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Umbraco.Addons\CL.Helper.General\CL.Helper.V7\CL.Helper.V7.csproj">
+      <Project>{a747903c-97ee-4391-b699-8e7c1dd9756c}</Project>
+      <Name>CL.Helper.V7</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Merchello.Core\Merchello.Core.csproj">
       <Project>{2a83a229-c24b-4d8d-b806-7c9999eb9461}</Project>
       <Name>Merchello.Core</Name>

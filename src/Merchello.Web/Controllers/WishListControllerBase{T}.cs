@@ -117,7 +117,8 @@
 
             WishList.Save();
 
-            return this.RedirectToUmbracoPage(redirectId);
+            // SS Redirect to wishlist
+            return this.RedirectToUmbracoPage(redirectId, "?s=wishlist");
         }
 
         /// <summary>

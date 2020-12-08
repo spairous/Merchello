@@ -6,7 +6,7 @@
     using System.Net.Mail;
     using System.Web.Mvc;
     using System.Web.Security;
-
+    using CL.Helper;
     using Merchello.Core;
     using Merchello.Core.Gateways.Notification.Smtp;
     using Merchello.Core.Logging;
@@ -181,6 +181,29 @@
                     // Log them in 
                     Members.Login(registerModel.Username, registerModel.Password);
                 }
+
+                if (this.Request["newsletter_signup"] == "1" && !string.IsNullOrEmpty(this.Request["newsletter_listId"]))
+                {
+                    try
+                    {
+                        CL.Helper.Api.MailChimpController.AddUserToList(model.Email, Request["newsletter_listId"]).RunSynchronously();
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                Email.SendEmailWithAttachment(null,
+                    new System.Net.Mail.MailAddress(model.Email, $"{model.FirstName} {model.LastName}"),
+                    "Registration Email",
+                    "/Media/emails/email_register.html",
+                    new Dictionary<string, string> {
+                        {"{email}",model.Email },
+                        {"{password}",model.Password },
+                        {"{firstname}",model.FirstName },
+                        {"{lastname}",model.LastName }
+                    },
+                    Email.LoadDefaultImages());
 
                 var redirectUrl = model.SuccessRedirectUrl.IsNullOrWhiteSpace()
                     ? Redirect("~/")
@@ -388,28 +411,38 @@
 				return CurrentUmbracoPage();
 			}
 
-			var newPassword = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, 0);
-			var user = Membership.GetUser(model.Username);
-			user.ChangePassword(newPassword, newPassword);
+            //var newPassword = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, 0);
+            //var user = Membership.GetUser(model.Username);
+            //user.ChangePassword(newPassword, newPassword);
 
-			// assumes you have set the SMTP settings in web.config and supplied a default "from" email
-			var msg = new MailMessage
-			{
-				Subject = string.Format("New Password for {0}", Request.Url.Host),
-				Body = string.Format("Your new password is: {0}", newPassword),
-				IsBodyHtml = false
-			};
-			msg.To.Add(new MailAddress(model.Username));
-			using (var smtpClient = new SmtpClient())
-			{
-				smtpClient.Send(msg);
-			}
+            //// assumes you have set the SMTP settings in web.config and supplied a default "from" email
+            //var msg = new MailMessage
+            //{
+            //	Subject = string.Format("New Password for {0}", Request.Url.Host),
+            //	Body = string.Format("Your new password is: {0}", newPassword),
+            //	IsBodyHtml = false
+            //};
+            //msg.To.Add(new MailAddress(model.Username));
+            //using (var smtpClient = new SmtpClient())
+            //{
+            //	smtpClient.Send(msg);
+            //}
 
-			viewData.Success = true;
-			viewData.Messages = new[] { "A new password has been emailed to you." };
-			ViewData["MerchelloViewData"] = viewData;
-			return CurrentUmbracoPage();
-		}
+            var passwordModel = new ChangingPasswordModel { Reset = true };
+            var result = Umbraco.MembershipHelper.ChangePassword(model.Username, passwordModel, "UmbracoMembershipProvider");
+
+            if (result.Success)
+            {
+                Email.ForgotPasswordEmail(model.Username, result.Result.ResetPassword);
+
+                viewData.Success = true;
+                viewData.Messages = new[] { "A new password has been emailed to you." };
+                
+            }
+
+            ViewData["MerchelloViewData"] = viewData;
+            return CurrentUmbracoPage();
+        }
 
 		/// <summary>
 		/// Renders the change password form.

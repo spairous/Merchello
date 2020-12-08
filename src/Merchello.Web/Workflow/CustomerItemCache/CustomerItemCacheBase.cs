@@ -483,6 +483,9 @@
             
             var price = productVariant.OnSale ? extendedData.GetSalePriceValue() : extendedData.GetPriceValue();
 
+            // SS Prevent adding more quantity than available
+            //if (productVariant.TotalInventoryCount < quantity && !productVariant.OutOfStockPurchase)
+            //    quantity = productVariant.TotalInventoryCount;
 
             AddItem(string.IsNullOrEmpty(name) ? productVariant.Name : name, productVariant.Sku, quantity, price, extendedData);
         }

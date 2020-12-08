@@ -266,6 +266,10 @@
                 if (!attempt.Success)
                     throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.InternalServerError, attempt.Exception));
 
+                // SS 
+                if (attempt.Result.ShipmentStatusKey == Constants.ShipmentStatus.Shipped)
+                    Notification.Trigger("OrderShipped", attempt.Result, new string[] { attempt.Result.Email });
+
                 return attempt.Result.ToShipmentDisplay();
 
             }
@@ -289,11 +293,21 @@
 
             if (merchShipment == null) throw new NullReferenceException("Shipment not found for key");
 
+            // SS 
+            Guid oldShipmentStatus = new Guid(merchShipment.ShipmentStatus.Key.ToString());
+
             merchShipment = shipment.ToShipment(merchShipment);
 
             _shipmentService.Save(merchShipment);
 
             this.UpdateOrderStatus(orderKeys);
+
+            // SS 
+            if (oldShipmentStatus != shipment.ShipmentStatus.Key &&
+                shipment.ShipmentStatus.Key == Constants.ShipmentStatus.Shipped)
+            {
+                Notification.Trigger("OrderShipped", merchShipment, new string[] { shipment.Email });
+            }
 
             return merchShipment.ToShipmentDisplay();
         }

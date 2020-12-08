@@ -41,8 +41,25 @@
             ProductContentFactory.Initializing += ProductContentFactoryOnInitializing;
 
             MemberService.Saved += MemberServiceSaved;
+            ItemCacheService.Saving += ItemCacheService_Saving;
 
             // ShipmentService.StatusChanged += ShipmentServiceStatusChanged;
+        }
+
+        private void ItemCacheService_Saving(IItemCacheService sender, Umbraco.Core.Events.SaveEventArgs<IItemCache> e)
+        {
+            // SS
+            //var merchello = new MerchelloHelper(false);
+            //foreach (var entities in e.SavedEntities)
+            //{
+            //    foreach (var item in entities.ProductLineItems())
+            //    {
+            //        var p = MerchelloContext.Current.Services.ProductVariantService.GetBySku(item.Sku);
+            //        if (p.TotalInventoryCount < item.Quantity)
+            //            item.Quantity = p.TotalInventoryCount;
+
+            //    }
+            //}
         }
 
         ///// <summary>
@@ -61,7 +78,7 @@
         //                        Core.Constants.DefaultKeys.ShipmentStatus.Delivered,
         //                        Core.Constants.DefaultKeys.ShipmentStatus.Shipped
         //                    };
-            
+
         //    foreach (var shipment in e.StatusChangedEntities)
         //    {
         //        if (!validKeys.Contains(shipment.ShipmentStatus.Key)) continue;
